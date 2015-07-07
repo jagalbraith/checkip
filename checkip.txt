@@ -1,0 +1,118 @@
+### ADD THIS TO YOUR ~/.bash_profile
+
+
+### COLORMOD 1.4
+### PRINTF TEXT COLORS USAGE: printf "Regular Text, ${txtRed}Red Text${txtNC}, Regular text.\n"
+txtBlack='\033[0;30m'
+txtDarkGray=='\033[1;30m'
+txtRed='\033[0;31m'
+txtLightRed='\033[1;31m'
+txtGreen='\033[0;32m'
+txtLightGreen='\033[1;32m'
+txtBrownOrange='\033[0;33m'
+txtYellow='\033[1;33m'
+txtBlue='\033[0;34m'
+txtLightBlue='\033[1;34m'
+txtPurple='\033[0;35m'
+txtLightPurple='\033[1;35m'
+txtCyan='\033[0;36m'
+txtLightCyan='\033[1;36m'
+txtLightGray='\033[0;37m'
+txtWhite='\033[1;37m'
+txtNC='\033[0m'
+
+
+
+
+
+
+##########################################################################################
+### FUNCTIONS
+#############
+
+
+checkip(){
+
+if [[ ! $1 ]]; then
+  printf "CHECKIP 1.1\n\n"
+  printf "Written by John Galbraith\n"
+  printf "\n\n"
+  printf "USAGE:\n"
+
+  printf "checkip [ip address]\n"
+  printf "checkip 8.8.8.8\n"
+
+elif [[ ! $txtLightGreen ]]; then
+  printf "Color mod is missing. Please install color mod 1.4."
+
+else
+
+feedback="    ${txtRed}>>>${txtYellow} $1 ${txtRed}POSITIVE!${txtNC}"
+### CINSCORE.COM IP LIST
+content=$(curl -L -s http://cinsscore.com/list/ci-badguys.txt)
+printf "${txtLightCyan}Checking CINSCORE.COM IP LIST${txtNC}\n"
+for line in $content
+do
+if [[ "$1" == "$line" ]]; then
+printf "$feedback\n"
+fi
+done
+unset content
+
+### EMERGING THREATS COMPROMIZED IP LIST
+content=$(curl -L -s https://rules.emergingthreats.net/blockrules/compromised-ips.txt)
+printf "${txtLightCyan}Checking EMERGING THREATS COMPROMIZED IP LIST${txtNC}\n"
+for line in $content
+do
+if [[ "$1" == "$line" ]]; then
+printf "$feedback\n"
+fi
+done
+unset content
+
+### EMERGING THREATS COMPLETE IP LIST
+content=$(curl -L -s https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt)
+printf "${txtLightCyan}Checking EMERGING THREATS COMPLETE IP LIST${txtNC}\n"
+for line in $content
+do
+if [[ "$1" == "$line" ]]; then
+printf "$feedback\n"
+fi
+done
+unset content
+
+### ALIENVAULT IP REPUTATION.SNORT LIST
+content=$(curl -L -s https://reputation.alienvault.com/reputation.snort)
+printf "${txtLightCyan}Checking ALIENVAULT IP REPUTATION.SNORT LIST${txtNC}\n"
+for line in $content
+do
+if [[ "$1" == "$line" ]]; then
+printf "$feedback\n"
+fi
+done
+unset content
+
+### ZEUSTRACKER BLOCKLIST IP LIST
+content=$(curl -L -s https://zeustracker.abuse.ch/blocklist.php?download=ipblocklist)
+printf "${txtLightCyan}Checking ZEUSTRACKER BLOCKLIST IP LIST${txtNC}\n"
+for line in $content
+do
+if [[ "$1" == "$line" ]]; then
+printf "$feedback\n"
+fi
+done
+unset content
+
+### ZEUSTRACKER BAD IP LIST
+content=$(curl -L -s https://zeustracker.abuse.ch/blocklist.php?download=badips)
+printf "${txtLightCyan}Checking ZEUSTRACKER BAD IP LIST${txtNC}\n"
+for line in $content
+do
+if [[ "$1" == "$line" ]]; then
+printf "$feedback\n"
+fi
+done
+unset content
+
+fi
+}
