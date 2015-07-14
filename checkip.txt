@@ -33,6 +33,26 @@ txtNC='\033[0m'
 
 checkip(){
 
+if [[ ! -e /tmp/.checkip_$(date +%Y%m%d) ]]; then
+	printf "Fetching todays data....\n"
+	mkdir /tmp/.checkip_$(date +%Y%m%d)
+
+	### GET ALL THE FILES
+
+	wget -q https://reputation.alienvault.com/reputation.snort -O /tmp/.checkip_$(date +%Y%m%d)/alienvault.txt
+	wget -q http://cinsscore.com/list/ci-badguys.txt -O /tmp/.checkip_$(date +%Y%m%d)/cinscore.txt
+	wget -q https://rules.emergingthreats.net/blockrules/compromised-ips.txt -O /tmp/.checkip_$(date +%Y%m%d)/etemerging.txt
+	wget -q https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt -O /tmp/.checkip_$(date +%Y%m%d)/etblock.txt
+	wget -q https://zeustracker.abuse.ch/blocklist.php?download=ipblocklist -O /tmp/.checkip_$(date +%Y%m%d)/zeusblock.txt
+	wget -q https://zeustracker.abuse.ch/blocklist.php?download=badips -O /tmp/.checkip_$(date +%Y%m%d)/zeusbad.txt
+
+
+
+
+
+fi
+
+
 if [[ ! $1 ]]; then
   printf "CHECKIP 1.1\n\n"
   printf "Written by John Galbraith\n"
@@ -45,73 +65,74 @@ if [[ ! $1 ]]; then
 elif [[ ! $txtLightGreen ]]; then
   printf "Color mod is missing. Please install color mod 1.4."
 
+
+elif [[ $1 == *"refresh"* ]]; then
+	rm -r -f /tmp/.checkip*
+
 else
 
 feedback="    ${txtRed}>>>${txtYellow} $1 ${txtRed}POSITIVE!${txtNC}"
 ### CINSCORE.COM IP LIST
-content=$(curl -L -s http://cinsscore.com/list/ci-badguys.txt)
 printf "${txtLightCyan}Checking CINSCORE.COM IP LIST${txtNC}\n"
-for line in $content
+while read line
 do
-if [[ "$1" == "$line" ]]; then
+if [[ "$line" == "$1"* ]]; then
 printf "$feedback\n"
 fi
-done
+done < /tmp/.checkip_$(date +%Y%m%d)/cinscore.txt
 unset content
 
 ### EMERGING THREATS COMPROMIZED IP LIST
-content=$(curl -L -s https://rules.emergingthreats.net/blockrules/compromised-ips.txt)
 printf "${txtLightCyan}Checking EMERGING THREATS COMPROMIZED IP LIST${txtNC}\n"
-for line in $content
+while read line
 do
-if [[ "$1" == "$line" ]]; then
+if [[ "$line" == "$1"* ]]; then
 printf "$feedback\n"
 fi
-done
+done < /tmp/.checkip_$(date +%Y%m%d)/etemerging.txt
 unset content
 
-### EMERGING THREATS COMPLETE IP LIST
-content=$(curl -L -s https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt)
+### EMERGING THREATS COMPLETE IP LIST --
 printf "${txtLightCyan}Checking EMERGING THREATS COMPLETE IP LIST${txtNC}\n"
-for line in $content
+while read line
 do
-if [[ "$1" == "$line" ]]; then
-printf "$feedback\n"
+if [[ "$line" == "#"* && "$line" == *[ABCDEFGHIJKLMNOPQRSTUVWXYZ]* ]]; then
+	varList="$line"
+elif [[ "$line" == "$1"* ]]; then
+printf "$feedback >>> $varList\n"
 fi
-done
+done < /tmp/.checkip_$(date +%Y%m%d)/etblock.txt
 unset content
 
 ### ALIENVAULT IP REPUTATION.SNORT LIST
-content=$(curl -L -s https://reputation.alienvault.com/reputation.snort)
 printf "${txtLightCyan}Checking ALIENVAULT IP REPUTATION.SNORT LIST${txtNC}\n"
-for line in $content
+while read line
 do
-if [[ "$1" == "$line" ]]; then
-printf "$feedback\n"
+if [[ "$line" == "$1"* ]]; then
+printf "$feedback >>> $(echo $line | sed 's/.*#//')\n"
+
 fi
-done
+done < /tmp/.checkip_$(date +%Y%m%d)/alienvault.txt
 unset content
 
 ### ZEUSTRACKER BLOCKLIST IP LIST
-content=$(curl -L -s https://zeustracker.abuse.ch/blocklist.php?download=ipblocklist)
 printf "${txtLightCyan}Checking ZEUSTRACKER BLOCKLIST IP LIST${txtNC}\n"
-for line in $content
+while read line
 do
-if [[ "$1" == "$line" ]]; then
+if [[ "$line" == "$1"* ]]; then
 printf "$feedback\n"
 fi
-done
+done < /tmp/.checkip_$(date +%Y%m%d)/zeusblock.txt
 unset content
 
 ### ZEUSTRACKER BAD IP LIST
-content=$(curl -L -s https://zeustracker.abuse.ch/blocklist.php?download=badips)
 printf "${txtLightCyan}Checking ZEUSTRACKER BAD IP LIST${txtNC}\n"
-for line in $content
+while read line
 do
-if [[ "$1" == "$line" ]]; then
+if [[ "$line" == "$1"* ]]; then
 printf "$feedback\n"
 fi
-done
+done < /tmp/.checkip_$(date +%Y%m%d)/zeusbad.txt
 unset content
 
 fi
